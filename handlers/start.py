@@ -28,8 +28,10 @@ def register_handlers(bot):
             status = "inactive"
             subscription_end = "1970-01-01"
 
+            # Добавление пользователя в базу данных
             add_user(user_id, username, status, subscription_end)
 
+            # Формирование клавиатуры
             keyboard = InlineKeyboardMarkup(row_width=1)
             keyboard.add(
                 InlineKeyboardButton("Калькуляторы", callback_data="calculators"),
@@ -40,12 +42,17 @@ def register_handlers(bot):
             bot.send_message(
                 message.chat.id,
                 (
-                    f"Добро пожаловать {username} в Матрицу чисел! 🌌\n\n"
+                    f"Добро пожаловать {username} в Матрицу чисел! \U0001F30C\n\n"
                     "Откройте для себя значение чисел и их влияние на вашу жизнь. Наш бот поможет вам рассчитать:\n"
-                    "🔢 Число жизненного пути\n"
-                    "🃏 Арканы по дате рождения (доступно бесплатно)\n"
+                    "\U0001F522 Число жизненного пути\n"
+                    "\U0001F0CF Арканы по дате рождения (доступно бесплатно)\n"
                     "⭐️ Звезду Пифагора и многое другое.\n\n"
-                    "Выберите интересующий вас раздел из меню ниже. 🚀"
+                    "Доступные функции:\n"
+                    "1️⃣ Калькуляторы — доступ к инструментам расчёта\n"
+                    "💎 Подписка — откройте доступ ко всем возможностям\n"
+                    "👥 Реферальная система — получайте бонусы за приглашения\n"
+                    "⏰ Напоминания — настройте ежедневные уведомления\n\n"
+                    "Начните прямо сейчас! Выберите интересующий вас раздел из меню ниже. 🚀"
                 ),
                 reply_markup=keyboard
             )
@@ -63,7 +70,7 @@ def register_handlers(bot):
 
             keyboard = InlineKeyboardMarkup(row_width=1)
             keyboard.add(
-                InlineKeyboardButton("Число арканов", callback_data="arcanum_number")
+                InlineKeyboardButton("Число арканов", callback_data="arcanum")
             )
 
             if has_active_subscription:
@@ -77,9 +84,7 @@ def register_handlers(bot):
                     InlineKeyboardButton("Подписаться", callback_data="subscribe")
                 )
 
-            keyboard.add(
-                InlineKeyboardButton("Назад", callback_data="main_menu")
-            )
+            keyboard.add(InlineKeyboardButton("Назад", callback_data="main_menu"))
 
             bot.edit_message_text(
                 "Воспользуйтесь нашим презентационным калькулятором.\n"
@@ -92,31 +97,7 @@ def register_handlers(bot):
             logger.error(f"Ошибка в 'show_calculators': {e}")
             bot.send_message(call.message.chat.id, "Произошла ошибка. Попробуйте позже.")
 
-    @bot.callback_query_handler(func=lambda call: call.data == "main_menu")
-    def show_main_menu(call):
-        """Возвращает пользователя в стартовое меню."""
-        try:
-            keyboard = InlineKeyboardMarkup(row_width=1)
-            keyboard.add(
-                InlineKeyboardButton("Калькуляторы", callback_data="calculators"),
-                InlineKeyboardButton("Подписка", callback_data="subscribe"),
-                InlineKeyboardButton("Напоминания", callback_data="reminders")
-            )
-
-            bot.edit_message_text(
-                (
-                    "Добро пожаловать в Матрицу чисел! 🌌\n\n"
-                    "Выберите интересующий вас раздел из меню ниже. 🚀"
-                ),
-                chat_id=call.message.chat.id,
-                message_id=call.message.message_id,
-                reply_markup=keyboard
-            )
-        except Exception as e:
-            logger.error(f"Ошибка в 'show_main_menu': {e}")
-            bot.send_message(call.message.chat.id, "Произошла ошибка. Попробуйте позже.")
-
-    @bot.callback_query_handler(func=lambda call: call.data == "arcanum_number")
+    @bot.callback_query_handler(func=lambda call: call.data == "arcanum")
     def handle_arcanum(call):
         """Обрабатывает выбор 'Число арканов'."""
         try:
@@ -145,3 +126,44 @@ def register_handlers(bot):
         except Exception as e:
             logger.error(f"Ошибка в 'process_arcanum': {e}")
             bot.send_message(message.chat.id, "Произошла ошибка при расчёте числа арканов. Попробуйте позже.")
+
+    @bot.callback_query_handler(func=lambda call: call.data == "subscribe")
+    def handle_subscribe(call):
+        """Обрабатывает выбор 'Подписка'."""
+        user_id = call.message.chat.id
+        try:
+            payment_url = create_payment(amount=1.0)
+            markup = InlineKeyboardMarkup()
+            pay_button = InlineKeyboardButton("Оплатить 1 рубль", url=payment_url)
+            markup.add(pay_button)
+
+            bot.send_message(
+                user_id,
+                "Для доступа ко всем калькуляторам оформите подписку.\n"
+                "Стоимость подписки: 1 рубль.",
+                reply_markup=markup
+            )
+        except Exception as e:
+            logger.error(f"Ошибка в 'handle_subscribe': {e}")
+            bot.send_message(user_id, "Произошла ошибка при создании ссылки на оплату.")
+
+    @bot.callback_query_handler(func=lambda call: call.data == "main_menu")
+    def show_main_menu(call):
+        """Возвращает пользователя в главное меню."""
+        try:
+            keyboard = InlineKeyboardMarkup(row_width=1)
+            keyboard.add(
+                InlineKeyboardButton("Калькуляторы", callback_data="calculators"),
+                InlineKeyboardButton("Подписка", callback_data="subscribe"),
+                InlineKeyboardButton("Напоминания", callback_data="reminders")
+            )
+
+            bot.edit_message_text(
+                "Выберите интересующий вас раздел:",
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                reply_markup=keyboard
+            )
+        except Exception as e:
+            logger.error(f"Ошибка в 'show_main_menu': {e}")
+            bot.send_message(call.message.chat.id, "Произошла ошибка. Попробуйте позже.")
