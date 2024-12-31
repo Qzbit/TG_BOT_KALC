@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Звезда Пифагора</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <h1>Звезда Пифагора</h1>
+  <form id="calculators">
+    <input type="text" name="birthdate" id="birthdate" placeholder="Введите дату (ДД.ММ.ГГГГ)" />
+    <button type="submit">Рассчитать</button>
+  </form>
+  <svg width="400" height="400" viewBox="0 0 200 200">
+    <polygon points="100,10 120,80 190,80 135,120 155,190 100,150 45,190 65,120 10,80 80,80" fill="black" stroke="white" stroke-width="2"></polygon>
+    <text id="num1" x="10" y="70" text-anchor="middle" fill="white">0</text>
+    <text id="num2" x="115" y="20" text-anchor="middle" fill="white">0</text>
+    <text id="num3" x="190" y="70" text-anchor="middle" fill="white">0</text>
+    <text id="num4" x="170" y="190" text-anchor="middle" fill="white">0</text>
+    <text id="num5" x="30" y="190" text-anchor="middle" fill="white">0</text>
+    <text id="center" x="100" y="110" text-anchor="middle" fill="white">0</text>
+  </svg>
+  <script src="/static/js/scripts.js"></script>
+</body>
+</html>

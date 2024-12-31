@@ -1,0 +1,20 @@
+
+# Payment Integration Instructions
+
+1. Choose a Payment System:
+   - Supported options: YooMoney, CloudPayments, Stripe, etc.
+
+2. Add API Keys:
+   - Obtain API keys from the payment provider.
+   - Add the keys to the `config.py` file.
+
+3. Implement Payment Logic:
+   - Create a new handler in `handlers/subscription.py` for processing payments.
+   - Use the payment provider's API to handle payment requests and confirmations.
+
+4. Test the Payment Workflow:
+   - Test the payment process in a sandbox environment provided by the payment system.
+   - Ensure proper handling of successful and failed payments.
+
+5. Deploy:
+   - Once tested, move to production and ensure secure storage of API keys.
